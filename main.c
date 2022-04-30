@@ -80,7 +80,7 @@ void startUltimateGame(int m[9][3][3],int xWonSquares[3][3],int oWonSquares[3][3
         do{
             flag=0;
             if(lastPlay==0){
-                lastPlay=1;
+            
                 printf("\n -> %c playing, chose the main square (ex: 1,2): ",player);
                 scanf("%d,%d", &x, &y);
                 if(x < 1 || x > 3 || y < 1 || y > 3){
@@ -93,52 +93,56 @@ void startUltimateGame(int m[9][3][3],int xWonSquares[3][3],int oWonSquares[3][3
                     }
                 }
             }else {
+                lastPlay=0;
                 if(xWonSquares[x-1][y-1]==1 || oWonSquares[x-1][y-1]==1){
-                flag=1;
+                    flag=1;
                 }else{
-                x=x1;
-                y=y1;
-            }     
-                }
+                    x=x1;
+                    y=y1;
+                }     
+            }
                 
         }while(flag!=0);
         
         do{
-        flag=0;
-        draw(m,x,y);
-        printf("\n -> %c playing, chose the position to play (Curret Square (%d,%d)): ",player,x,y);
-        scanf("%d,%d", &x1, &y1);  
-        if(x1 < 1 || x1 > 3 || y1 < 1 || y1 > 3){
-                printf("\n -> Invalid square, try again\n");
-                flag=1;
-        }else {
-            square = convertCoordinates(x,y);
-            if(m[square][x1-1][y1-1]!=-1){
-                    printf("\nThat position is occupied!");
+            flag=0;
+            draw(m,x,y);
+            printf("\n -> %c playing, chose the position to play (Curret Square (%d,%d)): ",player,x,y);
+            scanf("%d,%d", &x1, &y1);  
+            if(x1 < 1 || x1 > 3 || y1 < 1 || y1 > 3){
+                    printf("\n -> Invalid square, try again\n");
                     flag=1;
-            }else{
-                if(player=='X'){
-                    m[square][x1-1][y1-1]=1;
-                }else {
-                    if(player=='O'){
-                        m[square][x1-1][y1-1]=0;
+            }else {
+                square = convertCoordinates(x,y);
+                if(m[square][x1-1][y1-1]!=-1){
+                        printf("\nThat position is occupied!\n");
+                        flag=1;
+                }else{
+                    if(player=='X'){
+                        m[square][x1-1][y1-1]=1;
+                    }else {
+                        if(player=='O'){
+                            m[square][x1-1][y1-1]=0;
+                        }
                     }
+                    lastPlay=1;
+                    flag=0;
                 }
-                lastPlay=1;
-                flag=0;
             }
-        }
         }while(flag!=0);
-        printf("\nTa A SAIR %c\n",player);
+        
         squareWin = checkSquareWin(m,xWonSquares,oWonSquares,square);
         if(squareWin==1){
             printf("\n%c won a square",player);
         }
-        if(player='X'){
+        printf("\nTa A SAIR %c\n",player);
+        if(player=='X'){
             player='O';
-        }else {
+        }else{
             player='X';
+             printf("\nTa A SAIR %c\n",player);
         }
+       
 
     }while(gameEnd!=1);
   }
