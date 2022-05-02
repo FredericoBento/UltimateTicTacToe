@@ -9,8 +9,8 @@ void draw(int[9][3][3],int, int);
 void drawAll(int[3][3], int[3][3], int[3][3]);
 void drawFullBoard(int[9][3][3]);
 int convertCoordinates(int, int);
-int checkSquareWin(int[9][3][3], int[3][3], int[3][3],int);
-
+int checkSquareWin(int[9][3][3],int);
+int checkWin(int[3][3]);
   
 void main(void){
     int m9[9][3][3];
@@ -80,9 +80,16 @@ void startUltimateGame(int m[9][3][3],int xWonSquares[3][3],int oWonSquares[3][3
         do{
             flag=0;
             if(lastPlay==0){
-            
-                printf("\n -> %c playing, chose the main square (ex: 1,2): ",player);
-                scanf("%d,%d", &x, &y);
+                while(printf("\n -> %c playing, chose the main square (ex: x,y): ",player) && scanf("%d,%d", &x, &y)!=2){
+                        printf("\n -> Wrong input!");
+                        while ((x = getchar()) != '\n' && x != EOF) {}
+                        while ((y = getchar()) != '\n' && y != EOF) {}
+                }
+                
+                    
+                    
+          
+                
                 if(x < 1 || x > 3 || y < 1 || y > 3){
                     printf("\n -> Invalid square, try again\n");
                     flag=1;
@@ -96,9 +103,14 @@ void startUltimateGame(int m[9][3][3],int xWonSquares[3][3],int oWonSquares[3][3
                 lastPlay=0;
                 if(xWonSquares[x-1][y-1]==1 || oWonSquares[x-1][y-1]==1){
                     flag=1;
+
                 }else{
-                    x=x1;
-                    y=y1;
+                    if(xWonSquares[x1-1][y1-1]==1 || oWonSquares[x1-1][y1-1]==1){
+                        flag=1;
+                    }else {
+                        x=x1;
+                        y=y1;
+                    }
                 }     
             }
                 
@@ -108,7 +120,7 @@ void startUltimateGame(int m[9][3][3],int xWonSquares[3][3],int oWonSquares[3][3
             flag=0;
             draw(m,x,y);
             printf("\n -> %c playing, chose the position to play (Curret Square (%d,%d)): ",player,x,y);
-            scanf("%d,%d", &x1, &y1);  
+            scanf("%d,%d", &x1, &y1);   
             if(x1 < 1 || x1 > 3 || y1 < 1 || y1 > 3){
                     printf("\n -> Invalid square, try again\n");
                     flag=1;
@@ -131,16 +143,27 @@ void startUltimateGame(int m[9][3][3],int xWonSquares[3][3],int oWonSquares[3][3
             }
         }while(flag!=0);
         
-        squareWin = checkSquareWin(m,xWonSquares,oWonSquares,square);
+        squareWin = checkSquareWin(m,square);
         if(squareWin==1){
-            printf("\n%c won a square",player);
+            printf("\n%c won a square\n",player);
+            if(player=='X'){
+                xWonSquares[x-1][y-1] = 1;
+            }else {
+                oWonSquares[x-1][y-1] = 1;
+            }
         }
-        printf("\nTa A SAIR %c\n",player);
+        
+        if(player=='X'){
+            gameEnd = checkWin(xWonSquares);
+        }else{
+            gameEnd = checkWin(oWonSquares);
+        }
+       
+
         if(player=='X'){
             player='O';
         }else{
             player='X';
-             printf("\nTa A SAIR %c\n",player);
         }
        
 
@@ -244,12 +267,59 @@ int convertCoordinates(int x, int y){
 }
 
 //Check if someone won the game
-int checkWin(int m[9][3][3],int xWonSquares[3][3],int oWonSquares[3][3]){
+int checkWin(int m[3][3]){
+    int k,i,j;
+    int won=0;
+    int winner=-1;
+    for(i=0;i<3;i++){
+        //checks horizontal lines
+        if(m[i][0]!=0){
+            if(m[i][0]==m[i][1] && m[i][1]==m[i][2]){
+                won=1;
+                winner=m[i][0];
+                printf("\nWon Horizontal");
 
+            }else{
+                if(m[0][i]!=0){
+                    //check vertical lines
+                    if(m[0][i]==m[1][i] && m[1][i]==m[2][i]){
+                        won=1;
+                        winner=m[0][i];
+                        printf("\nWon Vertical");
+                        
+                    }
+                    // printf("\n%d,%d,%d\n",m[square][0][i],m[square][1][i],m[square][2][i]);
+                }
+                
+            }
+        }
+    }
+    //check left diagonal line
+    if(m[0][0]!=0){
+        if(m[0][0]==m[1][1] && m[1][1]==m[2][2]){
+            won=1;
+            winner=m[0][0];
+            printf("\nWon Left Diagonal");
+
+        }
+    }else if(m[0][2]!=0){
+        //check right diagonal line
+        if(m[0][2]==m[1][1] && m[1][1]==m[2][0]){
+            won=1;
+            winner=m[0][2];
+            printf("\nWon Right Diagonal");
+        }
+    }
+
+    if(won!=0){
+        return 1;
+    }else return 0;
+    
 }
 
+
 //Check if someone won a square
-int checkSquareWin(int m[9][3][3],int xWonSquares[3][3],int oWonSquares[3][3],int square){
+int checkSquareWin(int m[9][3][3],int square){
     int k,i,j;
     int won=0;
     int winner=-1;
@@ -259,14 +329,20 @@ int checkSquareWin(int m[9][3][3],int xWonSquares[3][3],int oWonSquares[3][3],in
             if(m[square][i][0]==m[square][i][1] && m[square][i][1]==m[square][i][2]){
                 won=1;
                 winner=m[square][i][0];
+                printf("\nWon Horizontal");
+
             }else{
-                //check vertical lines
-                if(m[square][0][i]==m[square][1][i] && m[square][1][i]==m[square][2][i]){
-                    won=1;
-                    winner=m[square][0][i];
-                }else{
-                
+                if(m[square][0][i]!=-1){
+                    //check vertical lines
+                    if(m[square][0][i]==m[square][1][i] && m[square][1][i]==m[square][2][i]){
+                        won=1;
+                        winner=m[square][0][i];
+                        printf("\nWon Vertical");
+                        
+                    }
+                    // printf("\n%d,%d,%d\n",m[square][0][i],m[square][1][i],m[square][2][i]);
                 }
+                
             }
         }
     }
@@ -275,12 +351,15 @@ int checkSquareWin(int m[9][3][3],int xWonSquares[3][3],int oWonSquares[3][3],in
         if(m[square][0][0]==m[square][1][1] && m[square][1][1]==m[square][2][2]){
             won=1;
             winner=m[square][0][0];
+            printf("\nWon Left Diagonal");
+
         }
     }else if(m[square][0][2]!=-1){
         //check right diagonal line
         if(m[square][0][2]==m[square][1][1] && m[square][1][1]==m[square][2][0]){
             won=1;
             winner=m[square][0][2];
+            printf("\nWon Right Diagonal");
         }
     }
 
